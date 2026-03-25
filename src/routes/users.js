@@ -4,8 +4,16 @@ const User = require('../models/user');
 
 // GET /users — list all registered users
 router.get('/', (req, res) => {
-  const users = User.getAll();
-  res.json(users);
+  try {
+    const users = User.getAll();
+    const publicUsers = users.map(user => ({
+      id: user.id,
+      username: user.username,
+    }));
+    res.json(publicUsers);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // POST /users/register — register a new user

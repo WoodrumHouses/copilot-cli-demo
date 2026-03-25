@@ -1,10 +1,13 @@
 const request = require('supertest');
 const Database = require('better-sqlite3');
 const { setDb } = require('../src/db');
+const User = require('../src/models/user');
 const app = require('../src/index');
 
 beforeEach(() => {
-  setDb(new Database(':memory:'));
+  const db = new Database(':memory:');
+  setDb(db);
+  User.initDb(db);
 });
 
 describe('Users API', () => {
@@ -49,6 +52,44 @@ describe('Users API', () => {
     it('should reject non-existent user', async () => {
       // TODO: Write actual test
       expect(true).toBe(true);
+    });
+  });
+
+  describe('GET /users', () => {
+    it('should return an empty array when no users exist', async () => {
+      const res = await request(app).get('/users');
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual([]);
+    });
+
+    it('should return all registered users', async () => {
+      const db = require('better-sqlite3')(':memory:');
+      setDb(db);
+      User.initDb(db);
+      db.prepare('INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)').run('alice', 'alice@example.com', 'hash1');
+      db.prepare('INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)').run('bob', 'bob@example.com', 'hash2');
+
+      const res = await request(app).get('/users');
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveLength(2);
+      expect(res.body[0]).toHaveProperty('username', 'alice');
+      expect(res.body[1]).toHaveProperty('username', 'bob');
+    });
+
+    it('should not include password_hash in response', async () => {
+      const db = require('better-sqlite3')(':memory:');
+      setDb(db);
+      User.initDb(db);
+      db.prepare('INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)').run('alice', 'alice@example.com', 'hash1');
+
+      const res = await request(app).get('/users');
+      expect(res.status).toBe(200);
+      res.body.forEach(user => {
+        expect(user).not.toHaveProperty('password_hash');
+        expect(user).toHaveProperty('id');
+        expect(user).toHaveProperty('username');
+        expect(user).toHaveProperty('email');
+      });
     });
   });
 

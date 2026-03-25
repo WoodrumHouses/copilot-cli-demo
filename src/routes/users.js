@@ -1,5 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/user');
+
+// GET /users — list all registered users
+router.get('/', (req, res) => {
+  const users = User.getAll();
+  res.json(users);
+});
 
 // POST /users/register — register a new user
 router.post('/register', (req, res) => {

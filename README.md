@@ -66,7 +66,6 @@ src/
     └── user.js        # User model (partially implemented)
 
 tests/
-├── setup.js           # Test database setup
 ├── tasks.test.js      # Task endpoint tests
 ├── validate.test.js   # Validation tests (currently failing)
 └── users.test.js      # User endpoint tests (stubs only)

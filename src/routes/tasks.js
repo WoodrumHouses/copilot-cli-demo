@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getDb } = require('../db');
+const { validateTask } = require('../middleware/validate');
 
 // GET /tasks — list all tasks
 router.get('/', (req, res) => {
@@ -43,7 +44,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /tasks — create a new task
-router.post('/', (req, res) => {
+router.post('/', validateTask, (req, res) => {
   try {
     const db = getDb();
     const { title, description, priority, assigned_to } = req.body;

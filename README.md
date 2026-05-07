@@ -78,3 +78,6 @@ npm test
 
 ## License
 MIT
+
+## Author
+Juan Trujillo Sr. Solution Engineer
